@@ -1,0 +1,53 @@
+- name: Setup
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    system_packages:
+      - fish
+      - git
+      - uv
+      - rustup
+      - helix
+      - yadm
+    flatpak_apps:
+      - org.mozilla.firefox
+      - dev.zed.Zed
+      - com.rioterm.Rio
+      - md.obsidian.Obsidian
+
+  tasks:
+    # Flathub
+    - name: Enable Flathub Repository
+      community.general.flatpak_remote:
+        name: flathub
+        state: present
+        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+
+    - name: Install Flatpak Applications
+      community.general.flatpak:
+        name: "{{ item }}"
+        remote: flathub
+        state: present
+      loop: "{{ flatpak_apps }}"
+
+    # Packages
+    - name: Install Layered System Packages
+      community.general.rpm_ostree_pkg:
+        name: "{{ system_packages }}"
+        state: present
+      register: ostree_result
+
+    # Shell
+    - name: Change shell to fish
+      user:
+        name: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+        shell: /usr/bin/fish
+      when: "'fish' in system_packages"
+
+    # Reboot
+    - name: Notify User of Reboot Requirement
+      reboot:
+        msg: "Rebooting"
+      when: ostree_result.changed  
