@@ -63,7 +63,7 @@
 
     - name: Install yadm
       command:
-        cmd: "yadm clone {{url}} --bootstrap"
+        cmd: "yadm clone {{url}}"
       when: not yadm_repo.stat.exists
       vars:
         url: "https://github.com/HeitorHenz/dotfiles.git"
