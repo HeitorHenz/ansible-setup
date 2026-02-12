@@ -30,8 +30,6 @@
       ansible.builtin.shell:
         cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
         creates: "{{ ansible_user_dir }}/.cargo/bin/uv"
-        become: true
-        become_user: "{{ ansible_env.SUDO_USER }}"
     # - name: Install uv tools
     #   command:
     #     cmd: "uv tool install {{ item }}"
@@ -62,8 +60,6 @@
       ansible.builtin.stat:
         path: "{{ ansible_facts.env.HOME }}/.local/share/yadm/repo.git"
       register: yadm_repo
-      become: true
-      become_user: "{{ ansible_env.SUDO_USER }}"
 
     - name: Install yadm
       command:
@@ -71,8 +67,6 @@
       when: not yadm_repo.stat.exists
       vars:
         url: "https://github.com/HeitorHenz/dotfiles.git"
-        become: true
-        become_user: "{{ ansible_env.SUDO_USER }}"
 
     - name: Create minimal bootstrap
       ansible.builtin.copy:
@@ -82,15 +76,11 @@
           yadm alt
         mode: "0755"
         when: not yadm_repo.stat.exists
-        become: true
-        become_user: "{{ ansible_env.SUDO_USER }}"
 
     - name: Run bootstrap
       ansible.builtin.command:
         cmd: "yadm bootstrap"
       when: not yadm_repo.stat.exists
-      become: true
-      become_user: "{{ ansible_env.SUDO_USER }}"
 
     # Reboot
     - name: Notify User of Reboot Requirement
