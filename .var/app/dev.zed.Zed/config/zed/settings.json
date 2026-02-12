@@ -17,10 +17,9 @@
     "left_padding": 0.05,
   },
   "agent": {
-    "always_allow_tool_actions": true,
     "default_model": {
-      "provider": "anthropic",
-      "model": "claude-sonnet-4-5-thinking-latest",
+      "provider": "deepseek",
+      "model": "deepseek-chat",
     },
     "default_profile": "ask",
     "model_parameters": [],
@@ -44,3 +43,4 @@
     },
   },
 }
+
