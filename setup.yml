@@ -20,6 +20,12 @@
       - yadm
 
   tasks:
+    # Uv
+    - name: Install uv tools
+      command:
+        cmd: "uv tool install {{ item }}"
+      loop: "{{ uv_tools }}"
+
     # Flathub
     - name: Enable Flathub Repository
       community.general.flatpak_remote:
@@ -33,6 +39,19 @@
         remote: flathub
         state: present
       loop: "{{ flatpak_apps }}"
+
+    # yadm
+    - name: Check dotfiles
+      stat:
+        path: "{{ ansible_env.HOME }}/.local/share/yadm/repo.git"
+      register: yadm_repo
+
+    - name: Install yadm
+      command:
+        cmd: "yadm clone {{url}} --bootstrap"
+      when: not yadm_repo.stat.exists
+      vars:
+        url: "https://github.com/HeitorHenz/dotfiles.git"
 
     # Packages
     - name: Install Layered System Packages

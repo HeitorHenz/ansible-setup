@@ -17,4 +17,6 @@ curl -sSL -o setup.yml https://raw.githubusercontent.com/heitorhenz/ansible-setu
 
 ansible-playbook setup.yml --ask-become-pass
 
+chsh -s /usr/bin/fish
+
 systemctl reboot
