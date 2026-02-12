@@ -11,11 +11,8 @@ if ! command -v ansible &> /dev/null; then
     uv install tool ansible
 fi
 
-# Install starship
+# Install starship -> move to cargo eventually
 curl -sS https://starship.rs/install.sh | sh
-
-# Install yadm
-curl -fLo /usr/local/bin/yadm https://github.com/yadm-dev/yadm/raw/master/yadm && chmod a+x /usr/local/bin/yadm
 
 # Run ansible
 ansible-galaxy collection install community.general

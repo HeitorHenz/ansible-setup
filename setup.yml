@@ -41,6 +41,13 @@
 
     # yadm
 
+    - name: Install yadm
+      become: true
+      ansible.builtin.get_url:
+        url: https://github.com/yadm-dev/yadm/raw/master/yadm
+        dest: /usr/local/bin/yadm
+        mode: "0755"
+
     - name: Check dotfiles
       stat:
         path: "{{ ansible_env.HOME }}/.local/share/yadm/repo.git"
