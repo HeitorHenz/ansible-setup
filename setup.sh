@@ -9,7 +9,7 @@ if ! command -v uv &> /dev/null; then
 fi
 
 if ! command -v ansible &> /dev/null; then
-    uv tool install ansible
+    uv tool install ansible-core --with ansible
 fi
 
 # Install starship -> move to cargo eventually
