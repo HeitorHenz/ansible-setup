@@ -19,6 +19,12 @@
       - ty
 
   tasks:
+    # Packages
+    - name: Install Layered System Packages
+      community.general.rpm_ostree_pkg:
+        name: "{{ system_packages }}"
+        state: present
+      register: ostree_result
     # uv
     - name: Install uv
       ansible.builtin.shell:
@@ -75,13 +81,6 @@
     - name: Run bootstrap
       ansible.builtin.command:
         cmd: "yadm bootstrap"
-
-    # Packages
-    - name: Install Layered System Packages
-      community.general.rpm_ostree_pkg:
-        name: "{{ system_packages }}"
-        state: present
-      register: ostree_result
 
     # Reboot
     - name: Notify User of Reboot Requirement
