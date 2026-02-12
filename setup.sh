@@ -4,10 +4,10 @@ set -e
 export PATH=$PATH:$HOME/.local/bin
 
 if ! command -v ansible &> /dev/null; then
+  rpm-ostree install python3-pip
   pip install --user ansible
 fi
 
 ansible-galaxy collection install community.general
 
 ansible-playbook setup.yml --ask-become-pass
-
