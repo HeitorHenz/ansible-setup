@@ -1,7 +1,6 @@
 - name: Setup
   hosts: localhost
   connection: local
-  become: true
 
   vars:
     system_packages:
