@@ -19,7 +19,12 @@
       - ty
 
   tasks:
-    # Uv
+    # uv
+    - name: Install uv
+      ansible.builtin.shell:
+        cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
+        creates: "{{ ansible_user_dir }}/.cargo/bin/uv"
+
     - name: Install uv tools
       command:
         cmd: "uv tool install {{ item }}"
@@ -40,9 +45,7 @@
       loop: "{{ flatpak_apps }}"
 
     # yadm
-
     - name: Install yadm
-      become: true
       ansible.builtin.get_url:
         url: https://github.com/yadm-dev/yadm/raw/master/yadm
         dest: /usr/local/bin/yadm
