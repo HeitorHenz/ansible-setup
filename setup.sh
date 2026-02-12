@@ -16,3 +16,5 @@ ansible-galaxy collection install community.general
 curl -sSL -o setup.yml https://raw.githubusercontent.com/heitorhenz/ansible-setup/main/setup.yml
 
 ansible-playbook setup.yml --ask-become-pass
+
+systemctl reboot

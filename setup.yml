@@ -9,12 +9,15 @@
       - git
       - rustup
       - helix
-      # - yadm
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
       - com.rioterm.Rio
       - md.obsidian.Obsidian
+    uv_tools:
+      - ruff
+      - ty
+      - yadm
 
   tasks:
     # Flathub
@@ -37,13 +40,6 @@
         name: "{{ system_packages }}"
         state: present
       register: ostree_result
-
-    # Shell
-    - name: Change shell to fish
-      user:
-        name: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
-        shell: /usr/bin/fish
-      when: "'fish' in system_packages"
 
     # Reboot
     - name: Notify User of Reboot Requirement
