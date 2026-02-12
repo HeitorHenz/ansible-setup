@@ -5,6 +5,7 @@ export PATH=$PATH:$HOME/.local/bin
 
 if ! command -v uv &> /dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH=$PATH:$HOME/.local/bin
 fi
 
 if ! command -v ansible &> /dev/null; then
