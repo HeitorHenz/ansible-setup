@@ -3,12 +3,12 @@ set -e
 
 export PATH=$PATH:$HOME/.local/bin
 
-if ! command -v uv &> /dev/null; then
+if !command -v uv &> /dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
     export PATH=$PATH:$HOME/.local/bin
 fi
 
-if ! command -v ansible &> /dev/null; then
+if !command -v ansible &> /dev/null; then
     uv tool install ansible-core --with ansible
 fi
 
