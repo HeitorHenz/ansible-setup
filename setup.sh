@@ -4,7 +4,7 @@ set -e
 export PATH=$PATH:$HOME/.local/bin
 
 if ! command -v ansible &> /dev/null; then
-  rpm-ostree install python3-pip
+  python3 -m ensurepip --upgrade --user
   pip install --user ansible
 fi
 
