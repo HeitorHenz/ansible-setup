@@ -1,6 +1,7 @@
 - name: Setup
   hosts: localhost
   connection: local
+  become: true
 
   vars:
     system_packages:
@@ -29,6 +30,7 @@
       ansible.builtin.shell:
         cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
         creates: "{{ ansible_user_dir }}/.cargo/bin/uv"
+      become: false
 
     # - name: Install uv tools
     #   command:
@@ -60,6 +62,7 @@
       ansible.builtin.stat:
         path: "{{ ansible_facts.env.HOME }}/.local/share/yadm/repo.git"
       register: yadm_repo
+      become: false
 
     - name: Install yadm
       command:
@@ -67,6 +70,7 @@
       when: not yadm_repo.stat.exists
       vars:
         url: "https://github.com/HeitorHenz/dotfiles.git"
+      become: false
 
     - name: Create minimal bootstrap
       ansible.builtin.copy:
@@ -75,11 +79,14 @@
           #!/bin/bash
           yadm alt
         mode: "0755"
-      when: ansible_facts.stat.exists is not defined or not ansible_facts.stat.exists
+        when: not yadm_repo.stat.exists
+        become: false
 
     - name: Run bootstrap
       ansible.builtin.command:
         cmd: "yadm bootstrap"
+      when: not yadm_repo.stat.exists
+      become: false
 
     # Reboot
     - name: Notify User of Reboot Requirement
