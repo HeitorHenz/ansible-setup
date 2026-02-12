@@ -7,7 +7,6 @@
     system_packages:
       - fish
       - git
-      - uv
       - rustup
       - helix
       # - yadm
@@ -25,12 +24,12 @@
         state: present
         flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
-    # - name: Install Flatpak Applications
-    #   community.general.flatpak:
-    #     name: "{{ item }}"
-    #     remote: flathub
-    #     state: present
-    #   loop: "{{ flatpak_apps }}"
+    - name: Install Flatpak Applications
+      community.general.flatpak:
+        name: "{{ item }}"
+        remote: flathub
+        state: present
+      loop: "{{ flatpak_apps }}"
 
     # Packages
     - name: Install Layered System Packages

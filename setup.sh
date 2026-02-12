@@ -3,8 +3,12 @@ set -e
 
 export PATH=$PATH:$HOME/.local/bin
 
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+
 if ! command -v ansible &> /dev/null; then
-    python3 -m pip install --user ansible
+    uv install tool ansible
 fi
 
 ansible-galaxy collection install community.general
