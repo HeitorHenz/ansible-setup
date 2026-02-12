@@ -17,7 +17,6 @@
     uv_tools:
       - ruff
       - ty
-      - yadm
 
   tasks:
     # Uv
@@ -41,6 +40,7 @@
       loop: "{{ flatpak_apps }}"
 
     # yadm
+
     - name: Check dotfiles
       stat:
         path: "{{ ansible_env.HOME }}/.local/share/yadm/repo.git"
