@@ -10,7 +10,7 @@
       - uv
       - rustup
       - helix
-      - yadm
+      # - yadm
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
@@ -25,12 +25,12 @@
         state: present
         flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
-    - name: Install Flatpak Applications
-      community.general.flatpak:
-        name: "{{ item }}"
-        remote: flathub
-        state: present
-      loop: "{{ flatpak_apps }}"
+    # - name: Install Flatpak Applications
+    #   community.general.flatpak:
+    #     name: "{{ item }}"
+    #     remote: flathub
+    #     state: present
+    #   loop: "{{ flatpak_apps }}"
 
     # Packages
     - name: Install Layered System Packages
@@ -50,4 +50,4 @@
     - name: Notify User of Reboot Requirement
       reboot:
         msg: "Rebooting"
-      when: ostree_result.changed  
+      when: ostree_result.changed
