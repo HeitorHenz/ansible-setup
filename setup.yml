@@ -51,14 +51,10 @@
 
     # yadm
     - name: Install yadm
-      become: true
-      become_user: root
       ansible.builtin.get_url:
         url: https://github.com/yadm-dev/yadm/raw/master/yadm
-        dest: /usr/local/bin/yadm
+        dest: "{{ ansible_env.HOME }}/.local/bin/yadm"
         mode: "0755"
-        owner: root
-        group: root
 
     - name: Check dotfiles
       ansible.builtin.stat:
