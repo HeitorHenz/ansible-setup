@@ -26,14 +26,10 @@
       register: ostree_result
 
     # uv
-    - name: Install uv
-      ansible.builtin.shell:
-        cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
-        creates: "{{ ansible_user_dir }}/.cargo/bin/uv"
-    # - name: Install uv tools
-    #   command:
-    #     cmd: "uv tool install {{ item }}"
-    #   loop: "{{ uv_tools }}"
+    - name: Install uv tools
+      command:
+        cmd: "uv tool install {{ item }}"
+      loop: "{{ uv_tools }}"
 
     # Flathub
     - name: Enable Flathub Repository
