@@ -1,15 +1,11 @@
 #!/bin/bash
 set -e
 
-export PATH=$PATH:$HOME/.local/bin
-
 curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH=$PATH:$HOME/.local/bin
 
-if !command -v ansible &> /dev/null; then
-    uv tool install ansible-core --with ansible
-    hash -r
-fi
+uv tool install ansible-core --with ansible
+hash -r
 
 # Install starship -> move to cargo eventually
 curl -sS https://starship.rs/install.sh | sh
