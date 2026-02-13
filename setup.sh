@@ -6,6 +6,8 @@ export PATH=$PATH:$HOME/.local/bin
 
 uv tool install ansible-core --with ansible
 
+curl -fLo /usr/local/bin/yadm https://github.com/yadm-dev/yadm/raw/master/yadm && chmod a+x /usr/local/bin/yadm
+
 # Install starship -> move to cargo eventually
 curl -sS https://starship.rs/install.sh | sh
 
