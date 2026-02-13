@@ -20,6 +20,7 @@
       - starship
       - bat
       - font-fira-code
+      - neofetch
 
   tasks:
     # Packages
