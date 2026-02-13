@@ -48,13 +48,13 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
-    # Homebrew
-    - name: Install Homebrew
-      become: yes
-      args:
-        creates: /home/linuxbrew/.linuxbrew/bin/brew
-      shell: |
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # # Homebrew
+    # - name: Install Homebrew
+    #   become: yes
+    #   args:
+    #     creates: /home/linuxbrew/.linuxbrew/bin/brew
+    #   shell: |
+    #     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
     - name: Install dev tools
       command:

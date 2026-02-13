@@ -3,6 +3,8 @@ set -e
 
 # Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 export PATH=$PATH:$HOME/.local/bin
 
 # Install Ansible
