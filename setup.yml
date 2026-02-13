@@ -5,9 +5,6 @@
   vars:
     system_packages:
       - fish
-      - git
-      - rustup
-      - helix
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
@@ -16,6 +13,12 @@
     uv_tools:
       - ruff
       - ty
+    dev_tools:
+      - helix
+      - ripgrep
+      - yadm
+      - starship
+      - bat
 
   tasks:
     # Packages
@@ -45,6 +48,17 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
+    # Homebrew
+    - name: Install Homebrew
+      shell: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    - name: Install dev tools
+      command:
+        cmd: "brew install {{ item }}"
+      loop: "{{ dev_tools }}"
+
+    # Dotfiles
     - name: Check dotfiles
       ansible.builtin.stat:
         path: "{{ ansible_facts.env.HOME }}/.local/share/yadm/repo.git"

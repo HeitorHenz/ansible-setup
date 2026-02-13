@@ -1,15 +1,12 @@
 #!/bin/bash
 set -e
 
+# Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH=$PATH:$HOME/.local/bin
 
+# Install Ansible
 uv tool install ansible-core --with ansible
-
-curl -fLo /usr/local/bin/yadm https://github.com/yadm-dev/yadm/raw/master/yadm && chmod a+x /usr/local/bin/yadm
-
-# Install starship -> move to cargo eventually
-curl -sS https://starship.rs/install.sh | sh
 
 # Run ansible
 ansible-galaxy collection install community.general
