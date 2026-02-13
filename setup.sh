@@ -10,6 +10,7 @@ fi
 
 if !command -v ansible &> /dev/null; then
     uv tool install ansible-core --with ansible
+    hash -r
 fi
 
 # Install starship -> move to cargo eventually
