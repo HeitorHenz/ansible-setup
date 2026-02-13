@@ -19,7 +19,7 @@
 
   tasks:
     # Packages
-    - name: Install Layered System Packages
+    - name: Install System Packages
       community.general.rpm_ostree_pkg:
         name: "{{ system_packages }}"
         state: present
@@ -45,19 +45,12 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
-    # yadm
-    - name: Install yadm
-      ansible.builtin.get_url:
-        url: https://github.com/yadm-dev/yadm/raw/master/yadm
-        dest: "/usr/local/bin/yadm"
-        mode: "0755"
-
     - name: Check dotfiles
       ansible.builtin.stat:
         path: "{{ ansible_facts.env.HOME }}/.local/share/yadm/repo.git"
       register: yadm_repo
 
-    - name: Install yadm
+    - name: Clone dotfiles
       command:
         cmd: "yadm clone {{url}}"
       when: not yadm_repo.stat.exists

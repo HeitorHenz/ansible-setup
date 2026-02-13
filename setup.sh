@@ -5,7 +5,6 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH=$PATH:$HOME/.local/bin
 
 uv tool install ansible-core --with ansible
-hash -r
 
 # Install starship -> move to cargo eventually
 curl -sS https://starship.rs/install.sh | sh
