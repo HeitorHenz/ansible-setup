@@ -7,6 +7,7 @@
       - fish
       - helix
       - stow
+      - fira-code-fonts
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
@@ -66,8 +67,8 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
-    # Remove default OS files to prevent Stow conflicts
-    - name: Remove default OS files to prevent Stow conflicts
+    # Stow
+    - name: Cleanup for Stow
       ansible.builtin.file:
         path: "{{ lookup('env', 'HOME') }}/{{ item }}"
         state: absent
@@ -75,8 +76,7 @@
         - .bashrc
         - .bash_profile
 
-    # Stow
-    - name: Stow all dotfiles dynamically
+    - name: Run Stow
       ansible.builtin.shell: stow -R */
       args:
         chdir: "{{ lookup('env', 'HOME') }}/.dotfiles"
