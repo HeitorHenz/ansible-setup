@@ -66,6 +66,15 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
+    # Remove default OS files to prevent Stow conflicts
+    - name: Remove default OS files to prevent Stow conflicts
+      ansible.builtin.file:
+        path: "{{ lookup('env', 'HOME') }}/{{ item }}"
+        state: absent
+      loop:
+        - .bashrc
+        - .bash_profile
+
     # Stow
     - name: Stow all dotfiles dynamically
       ansible.builtin.shell: stow -R */
