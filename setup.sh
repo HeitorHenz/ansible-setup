@@ -2,7 +2,7 @@
 set -e
 
 # Install Ansible
-sudo dnf install ansible ansible-collection-community-general
+sudo dnf install ansible ansible-collection-community-general -y
 
 # Clone dotfiles
 git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/.dotfiles
