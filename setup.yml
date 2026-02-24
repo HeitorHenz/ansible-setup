@@ -13,14 +13,14 @@
       - dev.zed.Zed
       - com.rioterm.Rio
       - md.obsidian.Obsidian
+    cargo_tools:
+      - uv
+      - starship
+      - ripgrep
+      - bat
     uv_tools:
       - ruff
       - ty
-    cargo_tools:
-      - ripgrep
-      - starship
-      - bat
-      - uv
 
   tasks:
     # Packages
