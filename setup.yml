@@ -31,9 +31,9 @@
 
     # Rustup
     - name: Install rustup
-      command:
+      ansible.builtin.shell:
         cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
-      creates: "{{ lookup('env', 'HOME') }}/.cargo/bin/rustup"
+        creates: "{{ lookup('env', 'HOME') }}/.cargo/bin/rustup"
 
     # Cargo
     - name: Install cargo tools
@@ -44,7 +44,7 @@
 
     # uv tools
     - name: Install uv tools
-      command:
+      ansible.builtin.shell::
         cmd: "uv tool install {{ item }}"
       loop: "{{ uv_tools }}"
 
