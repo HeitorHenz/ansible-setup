@@ -5,6 +5,8 @@
   vars:
     system_packages:
       - fish
+      - helix
+      - stow
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
@@ -13,22 +15,34 @@
     uv_tools:
       - ruff
       - ty
-    dev_tools:
-      - helix
+    cargo_tools:
       - ripgrep
-      - yadm
       - starship
       - bat
+      - uv
 
   tasks:
     # Packages
     - name: Install System Packages
-      community.general.rpm_ostree_pkg:
+      become: true
+      ansible.builtin.dnf:
         name: "{{ system_packages }}"
         state: present
-      register: ostree_result
 
-    # uv
+    # Rustup
+    - name: Install rustup
+      command:
+        cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
+      creates: "{{ lookup('env', 'HOME') }}/.cargo/bin/rustup"
+
+    # Cargo
+    - name: Install cargo tools
+      community.general.cargo:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ cargo_tools }}"
+
+    # uv tools
     - name: Install uv tools
       command:
         cmd: "uv tool install {{ item }}"
@@ -48,39 +62,8 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
-    # # Homebrew
-    # - name: Install Homebrew
-    #   become: yes
-    #   args:
-    #     creates: /home/linuxbrew/.linuxbrew/bin/brew
-    #   shell: |
-    #     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    - name: Install dev tools
-      command:
-        cmd: "brew install {{ item }}"
-      loop: "{{ dev_tools }}"
-
-    # Dotfiles
-    - name: Check dotfiles
-      ansible.builtin.stat:
-        path: "{{ ansible_facts.env.HOME }}/.local/share/yadm/repo.git"
-      register: yadm_repo
-
-    - name: Clone dotfiles
-      command:
-        cmd: "yadm clone {{url}}"
-      when: not yadm_repo.stat.exists
-      vars:
-        url: "https://github.com/HeitorHenz/dotfiles.git"
-
-    - name: Pull dotfiles
-      command:
-        cmd: "yadm pull"
-      when: yadm_repo.stat.exists
-
-    # Reboot
-    - name: Notify User of Reboot Requirement
-      reboot:
-        msg: "Rebooting"
-      when: ostree_result.changed
+    # Stow
+    - name: Stow all dotfiles dynamically
+      ansible.builtin.shell: stow -R */
+      args:
+        chdir: "{{ lookup('env', 'HOME') }}/.dotfiles"
