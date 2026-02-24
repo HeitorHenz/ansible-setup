@@ -31,9 +31,9 @@
 
     # Rustup
     - name: Install rustup
-      command:
-        cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
-        creates: "{{ lookup('env', 'HOME') }}/.cargo/bin/rustup"
+      ansible.builtin.shell: >
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      creates: "{{ lookup('env', 'HOME') }}/.cargo/bin/rustup"
 
     # Cargo
     - name: Install cargo tools
