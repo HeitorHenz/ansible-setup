@@ -41,12 +41,16 @@
         name: "{{ item }}"
         state: present
       loop: "{{ cargo_tools }}"
+      environment:
+        PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
 
     # uv tools
     - name: Install uv tools
       command:
         cmd: "uv tool install {{ item }}"
       loop: "{{ uv_tools }}"
+      environment:
+        PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
 
     # Flathub
     - name: Enable Flathub Repository
