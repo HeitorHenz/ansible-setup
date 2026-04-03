@@ -7,7 +7,7 @@
       - fish
       - helix
       - stow
-      - fira-code-fonts
+      - ttf-fira-code
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
@@ -26,9 +26,10 @@
     # Packages
     - name: Install System Packages
       become: true
-      ansible.builtin.dnf:
+      community.general.pacman:
         name: "{{ system_packages }}"
         state: present
+        update_cache: yes
 
     # Rustup
     - name: Install rustup
