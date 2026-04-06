@@ -11,6 +11,7 @@
       - awww
       - podman
       - quickshell
+
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
