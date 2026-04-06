@@ -8,6 +8,9 @@
       - helix
       - stow
       - ttf-fira-code
+      - awww
+      - podman
+      - quickshell
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
@@ -71,7 +74,7 @@
     # Conf
     - name: Clone dotfiles
       git:
-        repo: 'https://github.com/HeitorHenz/.dotfiles'
+        repo: "https://github.com/HeitorHenz/.dotfiles"
         dest: /home/h/.dotfiles
         update: yes
 
