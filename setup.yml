@@ -68,6 +68,13 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
+    # Conf
+    - name: Clone dotfiles
+      git:
+        repo: 'https://github.com/HeitorHenz/.dotfiles'
+        dest: /home/h/.dotfiles
+        update: yes
+
     # Stow
     - name: Cleanup for Stow
       ansible.builtin.file:
