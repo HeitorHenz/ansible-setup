@@ -21,6 +21,7 @@ vars:
     - libsecret
     - xdg-desktop-portal-hyprland
     - xdg-desktop-portal-gtk
+    - base-devel
   yay_apps:
     - sddm-theme-sugar-candy-git
   flatpak_apps:
