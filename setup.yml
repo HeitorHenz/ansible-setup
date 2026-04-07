@@ -97,7 +97,7 @@
 
     # AUR Packages
     - name: Install AUR packages via yay
-      shell: yay -S --needed --noconfirm "{{ item }}"
+      shell: echo "{{ ansible_become_password }}" | yay -S --needed --noconfirm --sudoflags="-S" "{{ item }}"
       loop: "{{ yay_apps }}"
       register: yay_install
       changed_when: >
