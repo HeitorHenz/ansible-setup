@@ -1,114 +1,132 @@
 # - name: Setup
-  hosts: localhost
-  connection: local
+hosts: localhost
+connection: local
 
-  vars:
-    system_packages:
-      - fish
-      - helix
-      - stow
-      - ttf-fira-code
-      - awww
-      - podman
-      - quickshell
-      - podman-compose
-      - gnome-keyring
-      - blueman
-      - gnome-calendar
-      - libfreeaptx
-      - libldac
-      - pipewire-audio
-      - libsecret
-      - xdg-desktop-portal-hyprland
-      - xdg-desktop-portal-gtk
-    flatpak_apps:
-      - org.mozilla.firefox
-      - dev.zed.Zed
-      - com.rioterm.Rio
-      - md.obsidian.Obsidian
-      - io.github.kolunmi.Bazaar
-    cargo_tools:
-      - uv
-      - starship
-      - ripgrep
-      - bat
-      - eza
-      - zoxide
-      - zellij
-    uv_tools:
-      - ruff
-      - ty
+vars:
+  system_packages:
+    - fish
+    - helix
+    - stow
+    - ttf-fira-code
+    - awww
+    - podman
+    - quickshell
+    - podman-compose
+    - gnome-keyring
+    - blueman
+    - gnome-calendar
+    - libfreeaptx
+    - libldac
+    - pipewire-audio
+    - libsecret
+    - xdg-desktop-portal-hyprland
+    - xdg-desktop-portal-gtk
+  yay_apps:
+    - sddm-theme-sugar-candy-git
+  flatpak_apps:
+    - org.mozilla.firefox
+    - dev.zed.Zed
+    - com.rioterm.Rio
+    - md.obsidian.Obsidian
+    - io.github.kolunmi.Bazaar
+  cargo_tools:
+    - uv
+    - starship
+    - ripgrep
+    - bat
+    - eza
+    - zoxide
+    - zellij
+  uv_tools:
+    - ruff
+    - ty
 
-  tasks:
-    # Packages
-    - name: Install System Packages
-      become: true
-      community.general.pacman:
-        name: "{{ system_packages }}"
-        state: present
-        update_cache: yes
+tasks:
+  # Packages
+  - name: Install System Packages
+    become: true
+    community.general.pacman:
+      name: "{{ system_packages }}"
+      state: present
+      update_cache: yes
 
-    # Rustup
-    - name: Install rustup
-      ansible.builtin.shell:
-        cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
-        creates: "{{ lookup('env', 'HOME') }}/.cargo/bin/rustup"
+  # Rustup
+  - name: Install rustup
+    ansible.builtin.shell:
+      cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
+      creates: "{{ lookup('env', 'HOME') }}/.cargo/bin/rustup"
 
-    # Cargo
-    - name: Install cargo tools
-      community.general.cargo:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ cargo_tools }}"
-      environment:
-        PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
+  # Cargo
+  - name: Install cargo tools
+    community.general.cargo:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ cargo_tools }}"
+    environment:
+      PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
 
-    # uv tools
-    - name: Install uv tools
-      command:
-        cmd: "uv tool install {{ item }}"
-      loop: "{{ uv_tools }}"
-      environment:
-        PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
+  # uv tools
+  - name: Install uv tools
+    command:
+      cmd: "uv tool install {{ item }}"
+    loop: "{{ uv_tools }}"
+    environment:
+      PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
 
-    # Flathub
-    - name: Enable Flathub Repository
-      community.general.flatpak_remote:
-        name: flathub
-        state: present
-        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  # Flathub
+  - name: Enable Flathub Repository
+    community.general.flatpak_remote:
+      name: flathub
+      state: present
+      flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
-    - name: Install Flatpak Applications
-      community.general.flatpak:
-        name: "{{ item }}"
-        remote: flathub
-        state: present
-      loop: "{{ flatpak_apps }}"
+  - name: Install Flatpak Applications
+    community.general.flatpak:
+      name: "{{ item }}"
+      remote: flathub
+      state: present
+    loop: "{{ flatpak_apps }}"
 
-    # Conf
-    - name: Clone dotfiles
-      git:
-        repo: "https://github.com/HeitorHenz/.dotfiles"
-        dest: /home/h/.dotfiles
-        update: yes
+  # AUR Helper
+  - name: Install yay (AUR helper)
+    become: true
+    pacman:
+      name: yay
+      state: present
 
-    # Stow
-    - name: Cleanup for Stow
-      ansible.builtin.file:
-        path: "{{ lookup('env', 'HOME') }}/{{ item }}"
-        state: absent
-      loop:
-        - .bashrc
-        - .bash_profile
+  # AUR Packages
+  - name: Install AUR packages via yay
+    shell: yay -S --needed --noconfirm "{{ item }}"
+    loop: { { yay_apps } }
+    register: yay_install
+    changed_when: >
+      'there is nothing to do' not in yay_install.stdout.lower() and
+      'up to date' not in yay_install.stdout.lower()
 
-    - name: Run Stow
-      ansible.builtin.shell: stow -R */
-      args:
-        chdir: "{{ lookup('env', 'HOME') }}/.dotfiles"
+  # Conf
+  - name: Clone dotfiles
+    git:
+      repo: "https://github.com/HeitorHenz/.dotfiles"
+      dest: /home/h/.dotfiles
+      update: yes
 
-    # Fish
-    - name: Set fish as the default shell
-      become: true
-      ansible.builtin.user:
-        name: "{{ lookup('env', 'USER') }}"
-        shell: /usr/bin/fish
+  # Stow
+  - name: Cleanup for Stow
+    ansible.builtin.file:
+      path: "{{ lookup('env', 'HOME') }}/{{ item }}"
+      state: absent
+    loop:
+      - .bashrc
+      - .bash_profile
+
+  - name: Run Stow
+    ansible.builtin.shell: stow -R */
+    args:
+      chdir: "{{ lookup('env', 'HOME') }}/.dotfiles"
+
+  # Fish
+  - name: Set fish as the default shell
+    become: true
+    ansible.builtin.user:
+      name: "{{ lookup('env', 'USER') }}"
+      shell: /usr/bin/fish
