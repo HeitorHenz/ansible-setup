@@ -1,4 +1,4 @@
-- name: Setup
+# - name: Setup
   hosts: localhost
   connection: local
 
@@ -11,17 +11,30 @@
       - awww
       - podman
       - quickshell
-
+      - podman-compose
+      - gnome-keyring
+      - blueman
+      - gnome-calendar
+      - libfreeaptx
+      - libldac
+      - pipewire-audio
+      - libsecret
+      - xdg-desktop-portal-hyprland
+      - xdg-desktop-portal-gtk
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
       - com.rioterm.Rio
       - md.obsidian.Obsidian
+      - io.github.kolunmi.Bazaar
     cargo_tools:
       - uv
       - starship
       - ripgrep
       - bat
+      - eza
+      - zoxide
+      - zellij
     uv_tools:
       - ruff
       - ty
