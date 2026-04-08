@@ -8,13 +8,9 @@
       - helix
       - stow
       - ttf-fira-code
-      - awww
       - podman
-      - quickshell
       - podman-compose
       - gnome-keyring
-      - blueman
-      - gnome-calendar
       - libfreeaptx
       - libldac
       - pipewire-audio
@@ -24,6 +20,7 @@
       - base-devel
     yay_apps:
       - sddm-theme-sugar-candy-git
+      - dms-shell-bin
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
