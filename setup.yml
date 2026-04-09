@@ -55,6 +55,7 @@
       loop:
         - { regexp: '^#Color', line: 'Color' }
         - { regexp: '^#ParallelDownloads', line: 'ParallelDownloads = 5' }
+        - { regexp: '^#ILoveCandy', line: 'ILoveCandy' }
   
     # Packages
     - name: Install System Packages
@@ -146,27 +147,4 @@
         dest: "{{ ansible_env.HOME }}/.dotfiles"
         update: yes
 
-    # Stow
-- name: Find all dotfile directories
-      ansible.builtin.find:
-        paths: "{{ ansible_env.HOME }}/.dotfiles"
-        file_type: directory
-        recurse: no
-        hidden: false
-      register: dotfile_dirs
-
-    - name: Run Stow
-      ansible.builtin.command: "stow -R {{ item.path | basename }}"
-      args:
-        chdir: "{{ ansible_env.HOME }}/.dotfiles"
-      loop: "{{ dotfile_dirs.files }}"
-      loop_control:
-        label: "{{ item.path | basename }}"
-      changed_when: false
-
-    # Fish
-    - name: Set fish as the default shell
-      become: true
-      ansible.builtin.user:
-        name: "{{ ansible_user_id }}"
-        shell: /usr/bin/fish
+    #
