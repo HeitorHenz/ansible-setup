@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-sudo pacman -Sy --noconfirm ansible git curl base-devel
+sudo pacman -Syu --noconfirm ansible git curl base-devel
 
 ansible-galaxy collection install kewlfft.aur
 
