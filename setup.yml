@@ -90,8 +90,6 @@
 
     # AUR
     - name: Install AUR packages
-      become: true
-      become_user: aur_builder
       kewlfft.aur.aur:
         name: "{{ yay_apps }}"
         use: yay
