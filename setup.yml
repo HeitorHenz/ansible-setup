@@ -1,8 +1,4 @@
-- name: Setup Arch Linux
-  hosts: localhost
-  connection: local
-
-  vars:
+vars:
     system_packages:
       - fish
       - helix
@@ -23,14 +19,13 @@
       - qt6-declarative
       - qt6-svg
       - qt6-wayland
-
+      - zed
+      - rio
     aur_apps:
       - sddm-eucalyptus-drop
       - dms-shell-bin
     flatpak_apps:
       - org.mozilla.firefox
-      - dev.zed.Zed
-      - com.rioterm.Rio
       - md.obsidian.Obsidian
       - io.github.kolunmi.Bazaar
     cargo_tools:
