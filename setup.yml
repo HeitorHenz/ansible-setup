@@ -1,4 +1,8 @@
-vars:
+- name: Setup Arch Linux
+  hosts: localhost
+  connection: local
+
+  vars:
     system_packages:
       - fish
       - helix
