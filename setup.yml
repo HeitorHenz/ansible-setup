@@ -45,17 +45,19 @@
       - ruff
       - ty
 
-  tasks:
-    - name: Pacman conf customization
+- name: Pacman conf customization
       become: true
-      ansible.builtin.lineinfile:
+      community.general.ini_file:
         path: /etc/pacman.conf
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
+        section: options
+        option: "{{ item.option }}"
+        value: "{{ item.value | default(omit) }}"
+        allow_no_value: "{{ item.no_value | default(false) }}"
+        state: present
       loop:
-        - { regexp: '^#Color', line: 'Color' }
-        - { regexp: '^#ParallelDownloads', line: 'ParallelDownloads = 5' }
-        - { regexp: '^#ILoveCandy', line: 'ILoveCandy' }
+        - { option: 'Color', no_value: true }
+        - { option: 'ParallelDownloads', value: '5' }
+        - { option: 'ILoveCandy', no_value: true }
   
     # Packages
     - name: Install System Packages
