@@ -54,7 +54,6 @@
       loop:
         - { regexp: '^#Color', line: 'Color' }
         - { regexp: '^#ParallelDownloads', line: 'ParallelDownloads = 5' }
-        - { regexp: '^#ILoveCandy', line: 'ILoveCandy' }
   
     # Packages
     - name: Install System Packages
