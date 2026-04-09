@@ -18,7 +18,6 @@
       - libsecret
       - xdg-desktop-portal-hyprland
       - xdg-desktop-portal-gtk
-      - base-devel
       - sddm
       - qt5-graphicaleffects
       - qt5-quickcontrols2
@@ -89,32 +88,7 @@
         remote: flathub
         state: present
 
-   # --- Ephemeral AUR Builder Setup ---
-    - name: Create temporary 'aur_builder' user
-      become: true
-      ansible.builtin.user:
-        name: aur_builder
-        create_home: yes
-        group: wheel
-
-    - name: Allow 'aur_builder' temporary passwordless sudo
-      become: true
-      ansible.builtin.lineinfile:
-        path: /etc/sudoers.d/11-install-aur_builder
-        line: 'aur_builder ALL=(ALL) NOPASSWD: /usr/bin/pacman'
-        create: yes
-        mode: '0644'
-        validate: 'visudo -cf %s'
-
-    # AUR Helper & Packages
-    - name: Bootstrap yay-bin
-      become: true
-      become_user: aur_builder
-      kewlfft.aur.aur:
-        name: yay-bin
-        use: makepkg
-        state: present
-
+    # AUR
     - name: Install AUR packages
       become: true
       become_user: aur_builder
@@ -123,21 +97,7 @@
         use: yay
         state: present
 
-    # --- Ephemeral AUR Builder Teardown ---
-    - name: Remove temporary sudoers file
-      become: true
-      ansible.builtin.file:
-        path: /etc/sudoers.d/11-install-aur_builder
-        state: absent
-
-    - name: Delete temporary 'aur_builder' user and home directory
-      become: true
-      ansible.builtin.user:
-        name: aur_builder
-        state: absent
-        remove: yes
-
-    # --- SDDM Configuration ---
+    # SDDM Configuration
     - name: Create SDDM configuration directory
       become: true
       ansible.builtin.file:
