@@ -147,15 +147,7 @@
         update: yes
 
     # Stow
-    - name: Cleanup default bash files to prevent Stow conflicts
-      ansible.builtin.file:
-        path: "{{ ansible_env.HOME }}/{{ item }}"
-        state: absent
-      loop:
-        - .bashrc
-        - .bash_profile
-
-    - name: Find all dotfile directories
+- name: Find all dotfile directories
       ansible.builtin.find:
         paths: "{{ ansible_env.HOME }}/.dotfiles"
         file_type: directory
@@ -164,14 +156,13 @@
       register: dotfile_dirs
 
     - name: Run Stow
-      community.general.stow:
-        state: latest
-        package: "{{ item.path | basename }}"
-        dir: "{{ ansible_env.HOME }}/.dotfiles"
-        target: "{{ ansible_env.HOME }}"
+      ansible.builtin.command: "stow -R {{ item.path | basename }}"
+      args:
+        chdir: "{{ ansible_env.HOME }}/.dotfiles"
       loop: "{{ dotfile_dirs.files }}"
       loop_control:
         label: "{{ item.path | basename }}"
+      changed_when: false
 
     # Fish
     - name: Set fish as the default shell
