@@ -25,7 +25,7 @@
       - qt6-wayland
 
     aur_apps:
-      - sddm-theme-sugar-candy-git
+      - sddm-eucalyptus-drop
       - dms-shell-bin
     flatpak_apps:
       - org.mozilla.firefox
@@ -114,14 +114,14 @@
         state: directory
         mode: "0755"
 
-    - name: Configure SDDM to use Sugar Candy theme
+    - name: Configure SDDM to use Eucalyptus Drop theme
       become: true
       ansible.builtin.copy:
         dest: /etc/sddm.conf.d/theme.conf
         content: |
           [Theme]
-          Current=sugar-candy
-        mode: "0644"
+          Current=eucalyptus-drop
+        mode: '0644'
 
     - name: Enable SDDM Service on boot
       become: true
