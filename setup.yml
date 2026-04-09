@@ -87,35 +87,40 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
-    # AUR Helper Installation (Fixed)
-    - name: Check if yay is installed
-      command: command -v yay
-      register: yay_check
-      ignore_errors: true
-      changed_when: false
+    # --- Secure AUR Setup ---
+    - name: Create the 'aur_builder' user
+      become: true
+      ansible.builtin.user:
+        name: aur_builder
+        create_home: yes
+        group: wheel
 
-    - name: Clone yay-bin from AUR
-      git:
-        repo: https://aur.archlinux.org/yay-bin.git
-        dest: /tmp/yay-bin
-      when: yay_check.rc != 0
+    - name: Allow 'aur_builder' to run 'sudo pacman' without a password
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/11-install-aur_builder
+        line: 'aur_builder ALL=(ALL) NOPASSWD: /usr/bin/pacman'
+        create: yes
+        mode: '0644'
+        validate: 'visudo -cf %s'
 
-    - name: Install yay
-      command: makepkg -si --noconfirm
-      args:
-        chdir: /tmp/yay-bin
-      when: yay_check.rc != 0
+    # AUR Helper Installation
+    - name: Bootstrap yay-bin using native makepkg
+      become: true
+      become_user: aur_builder
+      kewlfft.aur.aur:
+        name: yay-bin
+        use: makepkg
+        state: present
 
     # AUR Packages
     - name: Install AUR packages via yay
-      shell: >
-        echo "{{ ansible_become_password | default('') }}" | 
-        yay -S --needed --noconfirm --sudoflags="-S" "{{ item }}"
-      loop: "{{ yay_apps }}"
-      register: yay_install
-      changed_when: >
-        'there is nothing to do' not in yay_install.stdout.lower() and
-        'up to date' not in yay_install.stdout.lower()
+      become: true
+      become_user: aur_builder
+      kewlfft.aur.aur:
+        name: "{{ yay_apps }}"
+        use: yay
+        state: present
 
     # Conf
     - name: Clone dotfiles
