@@ -1,4 +1,4 @@
-- name: Setup
+- name: Setup Arch Linux
   hosts: localhost
   connection: local
 
@@ -18,6 +18,7 @@
       - xdg-desktop-portal-hyprland
       - xdg-desktop-portal-gtk
       - base-devel
+      - git
     yay_apps:
       - sddm-theme-sugar-candy-git
       - dms-shell-bin
@@ -85,16 +86,30 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
-    # AUR Helper
-    - name: Install yay (AUR helper)
-      become: true
-      community.general.pacman:
-        name: yay-bin
-        state: present
+    # AUR Helper Installation (Fixed)
+    - name: Check if yay is installed
+      command: command -v yay
+      register: yay_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Clone yay-bin from AUR
+      git:
+        repo: https://aur.archlinux.org/yay-bin.git
+        dest: /tmp/yay-bin
+      when: yay_check.rc != 0
+
+    - name: Install yay
+      command: makepkg -si --noconfirm
+      args:
+        chdir: /tmp/yay-bin
+      when: yay_check.rc != 0
 
     # AUR Packages
     - name: Install AUR packages via yay
-      shell: echo "{{ ansible_become_password }}" | yay -S --needed --noconfirm --sudoflags="-S" "{{ item }}"
+      shell: >
+        echo "{{ ansible_become_password | default('') }}" | 
+        yay -S --needed --noconfirm --sudoflags="-S" "{{ item }}"
       loop: "{{ yay_apps }}"
       register: yay_install
       changed_when: >
@@ -105,7 +120,7 @@
     - name: Clone dotfiles
       git:
         repo: "https://github.com/HeitorHenz/.dotfiles"
-        dest: /home/h/.dotfiles
+        dest: "{{ lookup('env', 'HOME') }}/.dotfiles"
         update: yes
 
     # Stow
