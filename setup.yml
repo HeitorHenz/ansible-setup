@@ -7,6 +7,7 @@
       - fish
       - helix
       - stow
+      - flatpak
       - ttf-fira-code
       - podman
       - podman-compose
