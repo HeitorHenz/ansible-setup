@@ -19,7 +19,11 @@
       - xdg-desktop-portal-hyprland
       - xdg-desktop-portal-gtk
       - base-devel
-      - git
+      - sddm
+      - qt5-graphicaleffects
+      - qt5-quickcontrols2
+      - qt5-svg
+
     yay_apps:
       - sddm-theme-sugar-candy-git
       - dms-shell-bin
@@ -87,15 +91,15 @@
         state: present
       loop: "{{ flatpak_apps }}"
 
-    # --- Secure AUR Setup ---
-    - name: Create the 'aur_builder' user
+   # --- Ephemeral AUR Builder Setup ---
+    - name: Create temporary 'aur_builder' user
       become: true
       ansible.builtin.user:
         name: aur_builder
         create_home: yes
         group: wheel
 
-    - name: Allow 'aur_builder' to run 'sudo pacman' without a password
+    - name: Allow 'aur_builder' temporary passwordless sudo
       become: true
       ansible.builtin.lineinfile:
         path: /etc/sudoers.d/11-install-aur_builder
@@ -104,8 +108,8 @@
         mode: '0644'
         validate: 'visudo -cf %s'
 
-    # AUR Helper Installation
-    - name: Bootstrap yay-bin using native makepkg
+    # AUR Helper & Packages
+    - name: Bootstrap yay-bin
       become: true
       become_user: aur_builder
       kewlfft.aur.aur:
@@ -113,14 +117,50 @@
         use: makepkg
         state: present
 
-    # AUR Packages
-    - name: Install AUR packages via yay
+    - name: Install AUR packages
       become: true
       become_user: aur_builder
       kewlfft.aur.aur:
         name: "{{ yay_apps }}"
         use: yay
         state: present
+
+    # --- Ephemeral AUR Builder Teardown ---
+    - name: Remove temporary sudoers file
+      become: true
+      ansible.builtin.file:
+        path: /etc/sudoers.d/11-install-aur_builder
+        state: absent
+
+    - name: Delete temporary 'aur_builder' user and home directory
+      become: true
+      ansible.builtin.user:
+        name: aur_builder
+        state: absent
+        remove: yes
+
+    # --- SDDM Configuration ---
+    - name: Create SDDM configuration directory
+      become: true
+      ansible.builtin.file:
+        path: /etc/sddm.conf.d
+        state: directory
+        mode: '0755'
+
+    - name: Configure SDDM to use Sugar Candy theme
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/sddm.conf.d/theme.conf
+        content: |
+          [Theme]
+          Current=sugar-candy
+        mode: '0644'
+
+    - name: Enable SDDM Service on boot
+      become: true
+      ansible.builtin.systemd:
+        name: sddm
+        enabled: yes
 
     # Conf
     - name: Clone dotfiles
