@@ -71,11 +71,10 @@
 
     # uv tools
     - name: Install uv tools
-      command:
+      ansible.builtin.command:
         cmd: "uv tool install {{ item }}"
+        creates: "{{ lookup('env', 'HOME') }}/.local/bin/{{ item }}"
       loop: "{{ uv_tools }}"
-      environment:
-        PATH: "{{ lookup('env', 'HOME') }}/.cargo/bin:{{ lookup('env', 'PATH') }}"
 
     # Flathub
     - name: Enable Flathub Repository
@@ -86,10 +85,9 @@
 
     - name: Install Flatpak Applications
       community.general.flatpak:
-        name: "{{ item }}"
+        name: "{{ flatpak_apps }}"
         remote: flathub
         state: present
-      loop: "{{ flatpak_apps }}"
 
    # --- Ephemeral AUR Builder Setup ---
     - name: Create temporary 'aur_builder' user
@@ -182,6 +180,7 @@
       ansible.builtin.shell: stow -R */
       args:
         chdir: "{{ lookup('env', 'HOME') }}/.dotfiles"
+      changed_when: false
 
     # Fish
     - name: Set fish as the default shell
