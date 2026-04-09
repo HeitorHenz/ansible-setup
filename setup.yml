@@ -25,9 +25,10 @@
       - qt6-wayland
       - zed
       - rio
+
     aur_apps:
       - sddm-eucalyptus-drop
-      - dms-shell-bin
+      - dms-shell
     flatpak_apps:
       - org.mozilla.firefox
       - md.obsidian.Obsidian
@@ -54,6 +55,7 @@
       loop:
         - { regexp: '^#Color', line: 'Color' }
         - { regexp: '^#ParallelDownloads', line: 'ParallelDownloads = 5' }
+        - { regexp: '^#ILoveCandy', line: 'ILoveCandy' }
   
     # Packages
     - name: Install System Packages
@@ -67,7 +69,7 @@
     - name: Install rustup
       ansible.builtin.shell:
         cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
-        creates: "{{ ansible_env.HOME }}/.cargo/bin/rustup"
+        creates: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/rustup"
 
     # Cargo
     - name: Install cargo tools
@@ -76,13 +78,13 @@
         state: present
       loop: "{{ cargo_tools }}"
       environment:
-        PATH: "{{ ansible_env.HOME }}/.cargo/bin:{{ ansible_env.PATH }}"
+        PATH: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin:{{ ansible_facts['env']['PATH'] }}"
 
     # uv tools
     - name: Install uv tools
       ansible.builtin.command:
         cmd: "uv tool install {{ item }}"
-        creates: "{{ ansible_env.HOME }}/.local/bin/{{ item }}"
+        creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
       loop: "{{ uv_tools }}"
 
     # Flathub
@@ -103,7 +105,7 @@
       become: true
       ansible.builtin.lineinfile:
         path: /etc/sudoers.d/pacman-nopasswd
-        line: "{{ ansible_user_id }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
+        line: "{{ ansible_facts['user_id'] }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
         create: yes
         mode: "0440"
         validate: "visudo -cf %s"
@@ -142,7 +144,38 @@
     - name: Clone dotfiles
       git:
         repo: "https://github.com/HeitorHenz/.dotfiles"
-        dest: "{{ ansible_env.HOME }}/.dotfiles"
+        dest: "{{ ansible_facts['env']['HOME'] }}/.dotfiles"
         update: yes
 
-    #
+    # Stow
+    - name: Cleanup default bash files to prevent Stow conflicts
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/{{ item }}"
+        state: absent
+      loop:
+        - .bashrc
+        - .bash_profile
+
+    - name: Find all dotfile directories
+      ansible.builtin.find:
+        paths: "{{ ansible_facts['env']['HOME'] }}/.dotfiles"
+        file_type: directory
+        recurse: no
+        hidden: false
+      register: dotfile_dirs
+
+    - name: Run Stow
+      ansible.builtin.command: "stow -R {{ item.path | basename }}"
+      args:
+        chdir: "{{ ansible_facts['env']['HOME'] }}/.dotfiles"
+      loop: "{{ dotfile_dirs.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
+      changed_when: false
+
+    # Fish
+    - name: Set fish as the default shell
+      become: true
+      ansible.builtin.user:
+        name: "{{ ansible_facts['user_id'] }}"
+        shell: /usr/bin/fish
