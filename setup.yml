@@ -46,6 +46,16 @@
       - ty
 
   tasks:
+    - name: Pacman conf customization
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/pacman.conf
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '^#Color', line: 'Color' }
+        - { regexp: '^#ParallelDownloads', line: 'ParallelDownloads = 5' }
+  
     # Packages
     - name: Install System Packages
       become: true
