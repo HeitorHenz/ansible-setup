@@ -3,9 +3,6 @@ set -e
 
 sudo pacman -Sy --noconfirm ansible git curl base-devel
 
-rm -rf /tmp/yay-bin
-git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin && cd /tmp/yay-bin && makepkg -si --noconfirm && rm -rf /tmp/yay-bin && cd ~
-
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/heitorhenz/ansible-setup/main/setup.sh)"
+bash -c "$(curl -sSL -o setup.yml https://raw.githubusercontent.com/heitorhenz/ansible-setup/main/setup.yml)"
 
 ansible-playbook setup.yml --ask-become-pass

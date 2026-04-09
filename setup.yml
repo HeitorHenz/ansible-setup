@@ -23,7 +23,7 @@
       - qt5-quickcontrols2
       - qt5-svg
 
-    yay_apps:
+    aur_apps:
       - sddm-theme-sugar-candy-git
       - dms-shell-bin
     flatpak_apps:
@@ -91,8 +91,8 @@
     # AUR
     - name: Install AUR packages
       kewlfft.aur.aur:
-        name: "{{ yay_apps }}"
-        use: yay
+        name: "{{ aur_apps }}"
+        use: paru
         state: present
 
     # SDDM Configuration
@@ -101,7 +101,7 @@
       ansible.builtin.file:
         path: /etc/sddm.conf.d
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Configure SDDM to use Sugar Candy theme
       become: true
@@ -110,7 +110,7 @@
         content: |
           [Theme]
           Current=sugar-candy
-        mode: '0644'
+        mode: "0644"
 
     - name: Enable SDDM Service on boot
       become: true
