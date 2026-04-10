@@ -12,7 +12,7 @@
       - ttf-fira-code
       - podman
       - podman-compose
-      - gnome-keyring      # <-- Kept safe and sound
+      - gnome-keyring
       - libfreeaptx
       - libldac
       - pipewire-audio
