@@ -58,7 +58,6 @@
       loop:
         - { option: 'Color', no_value: true }
         - { option: 'ParallelDownloads', value: '5' }
-        - { option: 'ILoveCandy', no_value: true }
   
     # Packages
     - name: Install System Packages
