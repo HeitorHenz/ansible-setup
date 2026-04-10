@@ -4,6 +4,7 @@
 
   vars:
     system_packages:
+      - rustup
       - fish
       - helix
       - stow
@@ -25,15 +26,6 @@
       - qt6-wayland
       - zed
       - rio
-
-    aur_apps:
-      - sddm-eucalyptus-drop
-      - dms-shell
-    flatpak_apps:
-      - org.mozilla.firefox
-      - md.obsidian.Obsidian
-      - io.github.kolunmi.Bazaar
-    cargo_tools:
       - uv
       - starship
       - ripgrep
@@ -41,6 +33,13 @@
       - eza
       - zoxide
       - zellij
+    aur_apps:
+      - sddm-eucalyptus-drop
+      - dms-shell
+    flatpak_apps:
+      - org.mozilla.firefox
+      - md.obsidian.Obsidian
+      - io.github.kolunmi.Bazaar
     uv_tools:
       - ruff
       - ty
@@ -66,21 +65,6 @@
         name: "{{ system_packages }}"
         state: present
         update_cache: yes
-
-    # Rustup
-    - name: Install rustup
-      ansible.builtin.shell:
-        cmd: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
-        creates: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/rustup"
-
-    # Cargo
-    - name: Install cargo tools
-      community.general.cargo:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ cargo_tools }}"
-      environment:
-        PATH: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin:{{ ansible_facts['env']['PATH'] }}"
 
     # uv tools
     - name: Install uv tools
