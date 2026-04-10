@@ -24,8 +24,6 @@
       - qt6-declarative
       - qt6-svg
       - qt6-wayland
-      - kvantum 
-      - qt6ct
       - zed
       - rio
       - uv
