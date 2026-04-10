@@ -45,6 +45,7 @@
       - ruff
       - ty
 
+  tasks:
     - name: Pacman conf customization
       become: true
       community.general.ini_file:
@@ -57,7 +58,7 @@
       loop:
         - { option: 'Color', no_value: true }
         - { option: 'ParallelDownloads', value: '5' }
-    
+  
     # Packages
     - name: Install System Packages
       become: true
