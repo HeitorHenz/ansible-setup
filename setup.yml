@@ -12,7 +12,7 @@
       - ttf-fira-code
       - podman
       - podman-compose
-      - gnome-keyring
+      - gnome-keyring      # <-- Kept safe and sound
       - libfreeaptx
       - libldac
       - pipewire-audio
@@ -57,6 +57,7 @@
       loop:
         - { option: 'Color', no_value: true }
         - { option: 'ParallelDownloads', value: '5' }
+        - { option: 'ILoveCandy', no_value: true }
   
     # Packages
     - name: Install System Packages
@@ -135,19 +136,22 @@
         force: yes
 
     # Stow
-    - name: Check for default bash files
+    - name: Check for conflicting default files
       ansible.builtin.stat:
         path: "{{ ansible_facts['env']['HOME'] }}/{{ item }}"
       loop:
         - .bashrc
         - .bash_profile
-      register: bash_file_stats
+        - .config/hypr/hyprland.conf
+        - .config/rio/config.toml
+        - .config/zed/settings.json
+      register: stow_conflicts
 
-    - name: Cleanup default bash files only if they are not symlinks
+    - name: Remove conflicting files if they are real files (not links)
       ansible.builtin.file:
         path: "{{ ansible_facts['env']['HOME'] }}/{{ item.item }}"
         state: absent
-      loop: "{{ bash_file_stats.results }}"
+      loop: "{{ stow_conflicts.results }}"
       when: item.stat.exists and not item.stat.islnk
 
     - name: Find all dotfile directories
