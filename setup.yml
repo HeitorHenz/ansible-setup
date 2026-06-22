@@ -13,6 +13,7 @@
       - podman
       - podman-compose
       - gnome-keyring
+      - ghostty
       - libfreeaptx
       - libldac
       - pipewire-audio
@@ -25,7 +26,6 @@
       - qt6-svg
       - qt6-wayland
       - zed
-      - alacritty
       - uv
       - starship
       - ripgrep
