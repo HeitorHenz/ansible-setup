@@ -26,6 +26,17 @@
       - qt6-svg
       - qt6-wayland
       - zed
+      - hyprshot
+    aur_apps:
+      - sddm-theme-sugar-candy-git
+      - dms-shell-bin
+    flatpak_apps:
+      - org.mozilla.firefox
+      - dev.zed.Zed
+      - com.rioterm.Rio
+      - md.obsidian.Obsidian
+      - io.github.kolunmi.Bazaar
+    cargo_tools:
       - uv
       - starship
       - ripgrep
