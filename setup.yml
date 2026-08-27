@@ -78,12 +78,12 @@
         state: present
         update_cache: yes
 
-    # uv tools
-    - name: Install uv tools
-      ansible.builtin.command:
-        cmd: "uv tool install {{ item }}"
-        creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
-      loop: "{{ uv_tools }}"
+    # # uv tools
+    # - name: Install uv tools
+    #   ansible.builtin.command:
+    #     cmd: "uv tool install {{ item }}"
+    #     creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
+    #   loop: "{{ uv_tools }}"
 
     # Flathub
     - name: Enable Flathub Repository
