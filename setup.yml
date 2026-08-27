@@ -27,9 +27,6 @@
       - qt6-wayland
       - zed
       - hyprshot
-    aur_apps:
-      - sddm-theme-sugar-candy-git
-      - dms-shell-bin
     flatpak_apps:
       - org.mozilla.firefox
       - dev.zed.Zed
@@ -47,10 +44,6 @@
     aur_apps:
       - sddm-eucalyptus-drop
       - dms-shell
-    flatpak_apps:
-      - org.mozilla.firefox
-      - md.obsidian.Obsidian
-      - io.github.kolunmi.Bazaar
     uv_tools:
       - ruff
       - ty
@@ -98,22 +91,22 @@
         remote: flathub
         state: present
 
-    # # Sudoers Configuration for Paru
-    # - name: Allow passwordless sudo for pacman
-    #   become: true
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/sudoers.d/pacman-nopasswd
-    #     line: "{{ ansible_facts['user_id'] }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
-    #     create: yes
-    #     mode: "0440"
-    #     validate: "visudo -cf %s"
+    # Sudoers Configuration for Paru
+    - name: Allow passwordless sudo for pacman
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/pacman-nopasswd
+        line: "{{ ansible_facts['user_id'] }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
+        create: yes
+        mode: "0440"
+        validate: "visudo -cf %s"
 
-    # # AUR
-    # - name: Install AUR packages
-    #   kewlfft.aur.aur:
-    #     name: "{{ aur_apps }}"
-    #     use: paru
-    #     state: present
+    # AUR
+    - name: Install AUR packages
+      kewlfft.aur.aur:
+        name: "{{ aur_apps }}"
+        use: paru
+        state: present
 
     # SDDM Configuration
     - name: Create SDDM configuration directory
