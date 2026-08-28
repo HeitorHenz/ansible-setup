@@ -12,7 +12,7 @@
       - ttf-fira-code
       - podman
       - podman-compose
-      - gnome-keyring
+      # - gnome-keyring
       - ghostty
       - libfreeaptx
       - libldac
@@ -20,7 +20,6 @@
       - libsecret
       - xdg-desktop-portal-hyprland
       - xdg-desktop-portal-gtk
-      - sddm
       - qt6-5compat
       - qt6-declarative
       - qt6-svg
@@ -28,9 +27,6 @@
       - zed
       - hyprshot
     flatpak_apps:
-      - org.mozilla.firefox
-      - dev.zed.Zed
-      - com.rioterm.Rio
       - md.obsidian.Obsidian
       - io.github.kolunmi.Bazaar
     cargo_tools:
@@ -41,9 +37,6 @@
       - eza
       - zoxide
       - zellij
-    aur_apps:
-      - sddm-eucalyptus-drop
-      - dms-shell
     uv_tools:
       - ruff
       - ty
@@ -61,7 +54,6 @@
       loop:
         - { option: 'Color', no_value: true }
         - { option: 'ParallelDownloads', value: '5' }
-        - { option: 'ILoveCandy', no_value: true }
   
     # Packages
     - name: Install System Packages
@@ -71,12 +63,12 @@
         state: present
         update_cache: yes
 
-    # # uv tools
-    # - name: Install uv tools
-    #   ansible.builtin.command:
-    #     cmd: "uv tool install {{ item }}"
-    #     creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
-    #   loop: "{{ uv_tools }}"
+    # uv tools
+    - name: Install uv tools
+      ansible.builtin.command:
+        cmd: "uv tool install {{ item }}"
+        creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
+      loop: "{{ uv_tools }}"
 
     # Flathub
     - name: Enable Flathub Repository
@@ -90,46 +82,6 @@
         name: "{{ flatpak_apps }}"
         remote: flathub
         state: present
-
-    # # Sudoers Configuration for Paru
-    # - name: Allow passwordless sudo for pacman
-    #   become: true
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/sudoers.d/pacman-nopasswd
-    #     line: "{{ ansible_facts['user_id'] }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
-    #     create: yes
-    #     mode: "0440"
-    #     validate: "visudo -cf %s"
-
-    # AUR
-    - name: Install AUR packages
-      kewlfft.aur.aur:
-        name: "{{ aur_apps }}"
-        use: paru
-        state: present
-
-    # SDDM Configuration
-    - name: Create SDDM configuration directory
-      become: true
-      ansible.builtin.file:
-        path: /etc/sddm.conf.d
-        state: directory
-        mode: "0755"
-
-    - name: Configure SDDM to use Eucalyptus Drop theme
-      become: true
-      ansible.builtin.copy:
-        dest: /etc/sddm.conf.d/theme.conf
-        content: |
-          [Theme]
-          Current=eucalyptus-drop
-        mode: '0644'
-
-    - name: Enable SDDM Service on boot
-      become: true
-      ansible.builtin.systemd:
-        name: sddm
-        enabled: yes
 
     # Conf
     - name: Clone dotfiles
