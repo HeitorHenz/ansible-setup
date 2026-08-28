@@ -21,7 +21,7 @@
       - starship
       - zoxide
       - zellij
-      # - gnome-keyring
+      - gnome-keyring
       - ghostty
       - libfreeaptx
       - libldac
