@@ -3,7 +3,10 @@
   connection: local
 
   vars:
+    home_dir: "{{ ansible_user_dir }}"
+
     system_packages:
+      - git
       - rustup
       - fish
       - helix
@@ -13,6 +16,11 @@
       - podman
       - podman-compose
       - eza
+      - bat
+      - ripgrep
+      - starship
+      - zoxide
+      - zellij
       # - gnome-keyring
       - ghostty
       - libfreeaptx
@@ -21,21 +29,11 @@
       - libsecret
       - xdg-desktop-portal-hyprland
       - xdg-desktop-portal-gtk
-      - qt6-5compat
-      - qt6-declarative
-      - qt6-svg
-      - qt6-wayland
       - zed
       - hyprshot
     flatpak_apps:
       - md.obsidian.Obsidian
       - io.github.kolunmi.Bazaar
-    cargo_tools:
-      - starship
-      - ripgrep
-      - bat
-      - zoxide
-      - zellij
     uv_tools:
       - ruff
       - ty
@@ -50,10 +48,11 @@
         value: "{{ item.value | default(omit) }}"
         allow_no_value: "{{ item.no_value | default(false) }}"
         state: present
+        backup: yes
       loop:
         - { option: 'Color', no_value: true }
         - { option: 'ParallelDownloads', value: '5' }
-  
+
     # Packages
     - name: Install System Packages
       become: true
@@ -61,13 +60,21 @@
         name: "{{ system_packages }}"
         state: present
         update_cache: yes
+      register: pacman_result
+      until: pacman_result is not failed
+      retries: 3
+      delay: 5
 
     # uv tools
     - name: Install uv tools
       ansible.builtin.command:
         cmd: "uv tool install {{ item }}"
-        creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
+        creates: "{{ home_dir }}/.local/bin/{{ item }}"
       loop: "{{ uv_tools }}"
+      register: uv_install
+      until: uv_install is not failed
+      retries: 3
+      delay: 5
 
     # Flathub
     - name: Enable Flathub Repository
@@ -75,25 +82,36 @@
         name: flathub
         state: present
         flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+      register: flathub_remote
+      until: flathub_remote is not failed
+      retries: 3
+      delay: 5
 
     - name: Install Flatpak Applications
       community.general.flatpak:
         name: "{{ flatpak_apps }}"
         remote: flathub
         state: present
+      register: flatpak_apps_result
+      until: flatpak_apps_result is not failed
+      retries: 3
+      delay: 5
 
     # Conf
     - name: Clone dotfiles
       ansible.builtin.git:
         repo: "https://github.com/HeitorHenz/.dotfiles"
-        dest: "{{ ansible_facts['env']['HOME'] }}/.dotfiles"
+        dest: "{{ home_dir }}/.dotfiles"
         update: yes
-        force: yes
+      register: clone_result
+      until: clone_result is not failed
+      retries: 3
+      delay: 5
 
     # Stow
     - name: Check for conflicting default files
       ansible.builtin.stat:
-        path: "{{ ansible_facts['env']['HOME'] }}/{{ item }}"
+        path: "{{ home_dir }}/{{ item }}"
       loop:
         - .bashrc
         - .bash_profile
@@ -103,31 +121,32 @@
 
     - name: Remove conflicting files if they are real files (not links)
       ansible.builtin.file:
-        path: "{{ ansible_facts['env']['HOME'] }}/{{ item.item }}"
+        path: "{{ home_dir }}/{{ item.item }}"
         state: absent
       loop: "{{ stow_conflicts.results }}"
       when: item.stat.exists and not item.stat.islnk
 
     - name: Find all dotfile directories
       ansible.builtin.find:
-        paths: "{{ ansible_facts['env']['HOME'] }}/.dotfiles"
+        paths: "{{ home_dir }}/.dotfiles"
         file_type: directory
         recurse: no
-        hidden: false
+        hidden: true
+        patterns: ['*']
+        excludes: ['.git']
       register: dotfile_dirs
 
     - name: Run Stow
-      ansible.builtin.command: "stow -R {{ item.path | basename }}"
-      args:
-        chdir: "{{ ansible_facts['env']['HOME'] }}/.dotfiles"
-      loop: "{{ dotfile_dirs.files }}"
-      loop_control:
-        label: "{{ item.path | basename }}"
-      changed_when: false
+      ansible.builtin.command:
+        cmd: "stow -v {{ dotfile_dirs.files | map(attribute='path') | map('basename') | join(' ') }}"
+        chdir: "{{ home_dir }}/.dotfiles"
+      register: stow_result
+      changed_when: "'LINK:' in stow_result.stderr"
+      when: dotfile_dirs.files | length > 0
 
     # Fish
     - name: Set fish as the default shell
       become: true
       ansible.builtin.user:
-        name: "{{ ansible_facts['user_id'] }}"
+        name: "{{ ansible_user_id }}"
         shell: /usr/bin/fish
