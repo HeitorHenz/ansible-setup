@@ -12,6 +12,7 @@
       - ttf-fira-code
       - podman
       - podman-compose
+      - eza
       # - gnome-keyring
       - ghostty
       - libfreeaptx
@@ -30,11 +31,9 @@
       - md.obsidian.Obsidian
       - io.github.kolunmi.Bazaar
     cargo_tools:
-      - uv
       - starship
       - ripgrep
       - bat
-      - eza
       - zoxide
       - zellij
     uv_tools:
