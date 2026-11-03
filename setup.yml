@@ -21,7 +21,6 @@
       - starship
       - zoxide
       - zellij
-      - gnome-keyring
       - ghostty
       - libfreeaptx
       - libldac
@@ -31,6 +30,22 @@
       - xdg-desktop-portal-gtk
       - zed
       - hyprshot
+      - fastfetch
+      - matugen
+      - uv
+      - ttf-firacode-nerd
+      - dux-shell
+      - dux-gop
+      - gopass
+      - gnupg
+      - pinentry
+      - python-secretstorage
+    aur_packages:
+      - dux-files-bin
+      - dux-search-bin
+      - dux-calendar-bin
+      - dux-greeter-bin
+      - gopass-secret-service
     flatpak_apps:
       - md.obsidian.Obsidian
       - io.github.kolunmi.Bazaar
@@ -62,6 +77,16 @@
         update_cache: yes
       register: pacman_result
       until: pacman_result is not failed
+      retries: 3
+      delay: 5
+
+    - name: Install AUR packages
+      ansible.builtin.command:
+        cmd: "yay -S --needed --noconfirm {{ aur_packages | join(' ') }}"
+      become: false
+      register: aur_install
+      changed_when: "'installing' in aur_install.stdout or 'upgrading' in aur_install.stdout"
+      until: aur_install is not failed
       retries: 3
       delay: 5
 

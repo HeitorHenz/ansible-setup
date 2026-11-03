@@ -7,6 +7,6 @@ sudo pacman -Syu --noconfirm ansible git curl base-devel
 
 # curl -LsSf https://astral.sh/uv/install.sh | sh
 
-bash -c "$(curl -sSL -o setup.yml https://raw.githubusercontent.com/heitorhenz/ansible-setup/main/setup.yml)"
+curl -fsSL -o setup.yml https://raw.githubusercontent.com/heitorhenz/ansible-setup/main/setup.yml
 
 ansible-playbook setup.yml --ask-become-pass
