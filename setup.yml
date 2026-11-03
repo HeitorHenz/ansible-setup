@@ -3,7 +3,7 @@
   connection: local
 
   vars:
-    home_dir: "{{ ansible_user_dir }}"
+    home_dir: "{{ ansible_facts['user_dir'] }}"
 
     system_packages:
       - git
@@ -54,27 +54,13 @@
       - ty
 
   tasks:
-    - name: Pacman conf customization
-      become: true
-      community.general.ini_file:
-        path: /etc/pacman.conf
-        section: options
-        option: "{{ item.option }}"
-        value: "{{ item.value | default(omit) }}"
-        allow_no_value: "{{ item.no_value | default(false) }}"
-        state: present
-        backup: yes
-      loop:
-        - { option: 'Color', no_value: true }
-        - { option: 'ParallelDownloads', value: '5' }
-
     # Packages
     - name: Install System Packages
       become: true
       community.general.pacman:
         name: "{{ system_packages }}"
         state: present
-        update_cache: yes
+        update_cache: true
       register: pacman_result
       until: pacman_result is not failed
       retries: 3
@@ -127,7 +113,7 @@
       ansible.builtin.git:
         repo: "https://github.com/HeitorHenz/.dotfiles"
         dest: "{{ home_dir }}/.dotfiles"
-        update: yes
+        update: true
       register: clone_result
       until: clone_result is not failed
       retries: 3
@@ -155,7 +141,7 @@
       ansible.builtin.find:
         paths: "{{ home_dir }}/.dotfiles"
         file_type: directory
-        recurse: no
+        recurse: false
         hidden: true
         patterns: ['*']
         excludes: ['.git']
@@ -173,5 +159,37 @@
     - name: Set fish as the default shell
       become: true
       ansible.builtin.user:
-        name: "{{ ansible_user_id }}"
+        name: "{{ ansible_facts['user_id'] }}"
         shell: /usr/bin/fish
+
+    - name: Ensure ~/.gnupg exists
+      ansible.builtin.file:
+        path: "{{ home_dir }}/.gnupg"
+        state: directory
+        mode: "0700"
+
+    - name: Pin gpg-agent to pinentry-qt
+      ansible.builtin.copy:
+        dest: "{{ home_dir }}/.gnupg/gpg-agent.conf"
+        mode: "0600"
+        content: |
+          pinentry-program /usr/bin/pinentry-qt
+          no-allow-external-cache
+          default-cache-ttl 28800
+          max-cache-ttl 28800
+
+    - name: Enable Dux user services
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        enabled: true
+        scope: user
+      loop:
+        - dms.service
+        - dfiles.service
+        - dsearch.service
+
+    - name: Default file manager for directories
+      community.general.xdg_mime:
+        mime_types:
+          - inode/directory
+        handler: dev.duxlabs.files.desktop
