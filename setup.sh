@@ -3,9 +3,17 @@ set -e
 
 sudo pacman -Syu --noconfirm ansible git curl base-devel
 
-# curl -fsSL https://install.danklinux.com | sh
+if ! command -v yay >/dev/null 2>&1; then
+    tmpdir="$(mktemp -d)"
+    git clone --depth 1 https://aur.archlinux.org/yay-bin.git "$tmpdir/yay-bin"
+    (cd "$tmpdir/yay-bin" && makepkg -si --noconfirm)
+    rm -rf "$tmpdir"
+fi
 
-# curl -LsSf https://astral.sh/uv/install.sh | sh
+yay -S --needed --noconfirm \
+    dux-files-bin dux-search-bin dux-calendar-bin dux-greeter-bin \
+    gopass-secret-service
+
 
 curl -fsSL -o setup.yml https://raw.githubusercontent.com/heitorhenz/ansible-setup/main/setup.yml
 
