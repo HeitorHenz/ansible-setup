@@ -26,26 +26,24 @@
       - libldac
       - pipewire-audio
       - libsecret
+      - gnome-keyring
       - xdg-desktop-portal-hyprland
       - xdg-desktop-portal-gtk
       - zed
-      - hyprshot
+      - wl-clipboard
       - fastfetch
       - matugen
       - uv
       - ttf-firacode-nerd
       - dux-shell
       - dux-gop
-      - gopass
       - gnupg
       - pinentry
-      - python-secretstorage
     aur_packages:
       - dux-files-bin
       - dux-search-bin
       - dux-calendar-bin
       - dux-greeter-bin
-      - gopass-secret-service
     flatpak_apps:
       - md.obsidian.Obsidian
       - io.github.kolunmi.Bazaar
@@ -187,6 +185,16 @@
         - dms.service
         - dfiles.service
         - dsearch.service
+
+    - name: Enable gnome-keyring auto-unlock in greetd
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/greetd
+        line: "{{ item }}"
+        backup: true
+      loop:
+        - "auth       optional     pam_gnome_keyring.so"
+        - "session    optional     pam_gnome_keyring.so auto_start"
 
     - name: Default file manager for directories
       community.general.xdg_mime:
